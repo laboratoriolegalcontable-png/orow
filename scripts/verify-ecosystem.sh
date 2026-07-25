@@ -49,6 +49,7 @@ check "Postgres+pgvector"    "docker exec oro-inmobiliaria-db pg_isready -U inmo
 echo ""
 echo "=== Fase 5: Marketing ==="
 check "n8n"                  "curl -sf http://localhost:5678/healthz"
+check "Matomo"               "curl -sf http://localhost:8050/"
 check "Mautic (opcional)"    "curl -sf http://localhost:8012/"
 
 echo ""
@@ -56,6 +57,7 @@ echo "=== Fase 6: Seguridad ==="
 check "Authentik"            "curl -sf http://localhost:9000/-/health/ready/"
 check "Vaultwarden"          "curl -sf http://localhost:8001/alive"
 check "Duplicati"            "curl -sf http://localhost:8200/"
+check "Syncthing"            "curl -sf http://localhost:8384/rest/noauth/health"
 
 echo ""
 echo "======================================"

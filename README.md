@@ -24,8 +24,8 @@ orden que convenga, sin arrastrar todo el stack de una.
 | 2 | `compose/fase2-legal` | Paperless-ngx (gestión documental + OCR), Stirling-PDF (edición de PDF), DocuSeal (firma digital) |
 | 3 | `compose/fase3-ia-local` | Ollama (modelos locales), Open WebUI (chat), Langflow (flujos visuales de IA) |
 | 4 | `compose/fase4-inmobiliaria` | Postgres 16 + pgvector compartido para CRM inmobiliario |
-| 5 | `compose/fase5-marketing` | n8n (automatización), Mautic (email marketing, opcional/pesado) |
-| 6 | `compose/fase6-seguridad` | Authentik (SSO), Vaultwarden (contraseñas), Duplicati (backups cifrados) |
+| 5 | `compose/fase5-marketing` | n8n (automatización), Matomo (analytics), Mautic (email marketing, opcional/pesado) |
+| 6 | `compose/fase6-seguridad` | Authentik (SSO), Vaultwarden (contraseñas), Duplicati (backups cifrados), Syncthing (sincronización a segundo destino) |
 | 7 | `scripts/verify-ecosystem.sh` | Script de verificación cruzada de todos los servicios activos |
 
 ## Herramientas de la propuesta original que NO están incluidas como Docker Compose

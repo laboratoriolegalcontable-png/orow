@@ -1,10 +1,15 @@
 # Fase 5 — Marketing, ventas y publicidad
 
-## Opción ligera (por defecto): n8n
+## Por defecto: n8n + Matomo
 
-`docker-compose.yml` levanta solo n8n con SQLite embebido (no necesita
-Postgres/MySQL aparte). Autenticación básica activada por defecto — cambiar
-`N8N_BASIC_AUTH_PASSWORD` en `.env` antes de levantar.
+`docker-compose.yml` levanta **n8n** (SQLite embebido, no necesita
+Postgres/MySQL aparte — autenticación básica activada por defecto, cambiar
+`N8N_BASIC_AUTH_PASSWORD` en `.env`) y **Matomo** (analytics propio,
+alternativa a Google Analytics, con su MariaDB incluido). Ambos verificados
+como seguros en `docs/VERIFICACION-HERRAMIENTAS-MARKETING.md`.
+
+Primer login de Matomo: entrar a `http://localhost:8050`, completar el
+wizard de instalación (crea el usuario admin ahí, no hay uno por defecto).
 
 ## Opción completa: sumar Mautic (solo si hay >4GB RAM libres)
 
@@ -33,6 +38,9 @@ pedía el plan original ("Mautic solo si hay >4GB RAM libres").
 ```bash
 # n8n responde
 curl -sf http://localhost:5678/healthz && echo "n8n OK"
+
+# Matomo responde
+curl -sf http://localhost:8050/ -o /dev/null && echo "Matomo OK"
 
 # Crear el primer workflow de prueba desde la UI:
 # http://localhost:5678 -> New Workflow -> Schedule Trigger (cron "0 9 * * *")

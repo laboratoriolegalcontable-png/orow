@@ -3,6 +3,9 @@
   "fases_completadas": [],
   "fase_actual": null,
   "puertos_asignados": {
+    "nginx_proxy_manager_admin": 81,
+    "netdata": 19999,
+    "dozzle": 8888,
     "portainer": 9443,
     "paperless": 8010,
     "stirling_pdf": 8011,
@@ -12,10 +15,12 @@
     "langflow": 7860,
     "inmobiliaria_db": 5433,
     "n8n": 5678,
+    "matomo": 8050,
     "mautic": 8012,
     "authentik": 9000,
     "vaultwarden": 8001,
-    "duplicati": 8200
+    "duplicati": 8200,
+    "syncthing_gui": 8384
   },
   "servicios": {},
   "variables_compartidas": {

@@ -12,6 +12,7 @@ volumes:
   vaultwarden-data:
   duplicati-data:
   duplicati-config:
+  syncthing-data:
 
 services:
   # --- Authentik: SSO / proveedor OAuth2 para el resto de los servicios ---
@@ -107,3 +108,20 @@ services:
       - duplicati-config:/data
       - duplicati-data:/backups
       - /var/lib/docker/volumes:/source/docker-volumes:ro
+
+  # --- Syncthing: sincronizacion de archivos hacia un segundo destino ---
+  # Complementa a Duplicati: un segundo lugar (otra maquina/NAS del Doctor,
+  # no necesariamente en la nube) donde queden copias de los backups.
+  syncthing:
+    image: docker.io/syncthing/syncthing:latest
+    container_name: oro-syncthing
+    restart: unless-stopped
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${SYNCTHING_GUI_PORT:-8384}:8384"
+      - "22000:22000/tcp"
+      - "22000:22000/udp"
+      - "21027:21027/udp"
+    volumes:
+      - syncthing-data:/var/syncthing
+      - duplicati-data:/var/syncthing/backups-duplicati:ro

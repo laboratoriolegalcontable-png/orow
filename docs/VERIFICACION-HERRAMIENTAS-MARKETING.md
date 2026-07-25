@@ -45,6 +45,25 @@ repo real y verificable.
   del hub `Probanza-ar/mcp-legal-ar`. Instalar ese hub completo si se
   necesita, no repos "SAIJ-MCP" sueltos de autores desconocidos.
 
+## Resultado de `instalar_todo.sh` (script de ~130 herramientas propuesto después)
+
+Se propuso un script bash único ("Imperio Digital") que instala todo con
+`docker run`/`git clone` directo al host, sin `.env`, con contraseñas
+hardcodeadas, y abriendo el firewall a los puertos 3000-9092 hacia internet.
+No se ejecutó — contradice la arquitectura de este repo (secretos generados,
+servicios en `127.0.0.1`, único punto de entrada por Nginx Proxy Manager).
+De ese script, lo único nuevo y legítimo que se sumó a Orosa Nexus:
+
+- **Matomo** → `compose/fase5-marketing` (ya estaba en la lista de "seguras" de arriba)
+- **Syncthing** → `compose/fase6-seguridad`, como segundo destino de
+  sincronización de los backups de Duplicati (proyecto real, muy conocido,
+  no evaluado antes por no estar en la lista original)
+
+Lo demás del script (Corredor, LawLink, J.A.R.V.I.S., Authelia, Dify, Home
+Assistant, Supabase self-hosteado vía CLI) **no se agregó** — mismos motivos
+que ya están documentados arriba y en `docs/FASE-3-ia-local.md` (Dify) /
+`docs/FASE-0-monitoreo-acceso.md` (por qué no Authelia).
+
 ## Explícitamente descartado (no es una cuestión de verificación de software)
 
 Se propuso además un módulo "Modo Espionaje / Inteligencia Legal" para

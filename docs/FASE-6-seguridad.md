@@ -7,6 +7,7 @@
 | Authentik | `ghcr.io/goauthentik/server` | 9000 |
 | Vaultwarden | `vaultwarden/server` | 8001 |
 | Duplicati | `duplicati/duplicati` | 8200 |
+| Syncthing | `syncthing/syncthing` | 8384 (GUI), 22000/21027 (sync) |
 
 ## Orden de arranque
 
@@ -84,4 +85,21 @@ curl -sf http://localhost:8001/alive && echo "Vaultwarden OK"
 
 # Duplicati responde
 curl -sf http://localhost:8200/ -o /dev/null && echo "Duplicati OK"
+
+# Syncthing responde
+curl -sf http://localhost:8384/rest/noauth/health && echo "Syncthing OK"
 ```
+
+## Syncthing: segundo destino de backup, no reemplaza a Duplicati
+
+Duplicati hace backups **cifrados** de los volúmenes. Syncthing sincroniza
+esos mismos backups hacia una segunda máquina (otro servidor, o la PC vieja
+del Doctor con TrueNAS, si se termina usando para eso) — así hay dos copias
+en dos lugares físicos distintos, no solo dos herramientas en el mismo
+servidor.
+
+Primer uso: entrar a `http://localhost:8384`, la propia UI pide configurar
+usuario/contraseña de acceso en el primer login (no hay uno por defecto).
+Después, en "Add Remote Device" conectar el segundo equipo usando su Device
+ID, y compartir la carpeta `/var/syncthing/backups-duplicati` (montada
+solo-lectura desde el volumen de Duplicati).

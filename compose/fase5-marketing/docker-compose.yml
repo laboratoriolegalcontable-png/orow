@@ -6,8 +6,45 @@ networks:
 
 volumes:
   n8n-data:
+  matomo-data:
+  matomo-db:
 
 services:
+  # --- Matomo: analytics propio (alternativa a Google Analytics) ---
+  matomo-db:
+    image: docker.io/library/mariadb:11
+    container_name: oro-matomo-db
+    restart: unless-stopped
+    networks: [oro-net]
+    environment:
+      MARIADB_DATABASE: matomo
+      MARIADB_USER: matomo
+      MARIADB_PASSWORD: ${MATOMO_DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MATOMO_DB_ROOT_PASSWORD}
+    volumes:
+      - matomo-db:/var/lib/mysql
+
+  matomo:
+    image: docker.io/library/matomo:latest
+    container_name: oro-matomo
+    restart: unless-stopped
+    depends_on:
+      - matomo-db
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${MATOMO_PORT:-8050}:80"
+    environment:
+      MATOMO_DATABASE_HOST: matomo-db
+      MATOMO_DATABASE_USERNAME: matomo
+      MATOMO_DATABASE_PASSWORD: ${MATOMO_DB_PASSWORD}
+      MATOMO_DATABASE_DBNAME: matomo
+    volumes:
+      - matomo-data:/var/www/html
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
   n8n:
     image: docker.io/n8nio/n8n:latest
     container_name: oro-n8n
