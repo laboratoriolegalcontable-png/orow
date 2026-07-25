@@ -20,7 +20,9 @@
     "authentik": 9000,
     "vaultwarden": 8001,
     "duplicati": 8200,
-    "syncthing_gui": 8384
+    "syncthing_gui": 8384,
+    "wikijs": 3300,
+    "fireflyiii": 8060
   },
   "servicios": {},
   "variables_compartidas": {

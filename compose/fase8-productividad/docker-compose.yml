@@ -1,0 +1,78 @@
+name: oro-fase8-productividad
+
+networks:
+  oro-net:
+    external: true
+
+volumes:
+  wikijs-db:
+  fireflyiii-db:
+  fireflyiii-data:
+  fireflyiii-export:
+
+services:
+  # --- Wiki.js: base de conocimiento interna (procedimientos, plantillas) ---
+  wikijs-db:
+    image: docker.io/library/postgres:16
+    container_name: oro-wikijs-db
+    restart: unless-stopped
+    networks: [oro-net]
+    environment:
+      POSTGRES_DB: wikijs
+      POSTGRES_USER: wikijs
+      POSTGRES_PASSWORD: ${WIKIJS_DB_PASSWORD}
+    volumes:
+      - wikijs-db:/var/lib/postgresql/data
+
+  wikijs:
+    image: ghcr.io/requarks/wiki:2
+    container_name: oro-wikijs
+    restart: unless-stopped
+    depends_on:
+      - wikijs-db
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${WIKIJS_PORT:-3300}:3000"
+    environment:
+      DB_TYPE: postgres
+      DB_HOST: wikijs-db
+      DB_PORT: 5432
+      DB_NAME: wikijs
+      DB_USER: wikijs
+      DB_PASS: ${WIKIJS_DB_PASSWORD}
+
+  # --- Firefly III: contabilidad/finanzas propias del estudio (no facturacion a clientes) ---
+  fireflyiii-db:
+    image: docker.io/library/postgres:16
+    container_name: oro-fireflyiii-db
+    restart: unless-stopped
+    networks: [oro-net]
+    environment:
+      POSTGRES_DB: firefly
+      POSTGRES_USER: firefly
+      POSTGRES_PASSWORD: ${FIREFLYIII_DB_PASSWORD}
+    volumes:
+      - fireflyiii-db:/var/lib/postgresql/data
+
+  fireflyiii:
+    image: docker.io/fireflyiii/core:latest
+    container_name: oro-fireflyiii
+    restart: unless-stopped
+    depends_on:
+      - fireflyiii-db
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${FIREFLYIII_PORT:-8060}:8080"
+    environment:
+      APP_KEY: ${FIREFLYIII_APP_KEY}
+      DB_CONNECTION: pgsql
+      DB_HOST: fireflyiii-db
+      DB_PORT: 5432
+      DB_DATABASE: firefly
+      DB_USERNAME: firefly
+      DB_PASSWORD: ${FIREFLYIII_DB_PASSWORD}
+      APP_URL: ${FIREFLYIII_URL:-http://localhost:8060}
+      TZ: America/Argentina/Buenos_Aires
+    volumes:
+      - fireflyiii-data:/var/www/html/storage/upload
+      - fireflyiii-export:/var/www/html/storage/export

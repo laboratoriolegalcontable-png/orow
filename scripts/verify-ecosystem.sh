@@ -60,6 +60,11 @@ check "Duplicati"            "curl -sf http://localhost:8200/"
 check "Syncthing"            "curl -sf http://localhost:8384/rest/noauth/health"
 
 echo ""
+echo "=== Fase 8: Productividad interna ==="
+check "Wiki.js"               "curl -sf http://localhost:3300/"
+check "Firefly III"           "curl -sf http://localhost:8060/"
+
+echo ""
 echo "======================================"
 echo "Resultado: ${pass} OK / ${fail} fallo(s)"
 echo "======================================"

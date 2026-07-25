@@ -27,6 +27,7 @@ orden que convenga, sin arrastrar todo el stack de una.
 | 5 | `compose/fase5-marketing` | n8n (automatización), Matomo (analytics), Mautic (email marketing, opcional/pesado) |
 | 6 | `compose/fase6-seguridad` | Authentik (SSO), Vaultwarden (contraseñas), Duplicati (backups cifrados), Syncthing (sincronización a segundo destino) |
 | 7 | `scripts/verify-ecosystem.sh` | Script de verificación cruzada de todos los servicios activos |
+| 8 | `compose/fase8-productividad` | Wiki.js (base de conocimiento interna), Firefly III (finanzas propias del estudio) |
 
 ## Herramientas de la propuesta original que NO están incluidas como Docker Compose
 
@@ -98,6 +99,11 @@ docker compose up -d
 # 7. Verificación cruzada
 cd /workspace/orosa-nexus  # o donde esté clonado en el servidor
 ./scripts/verify-ecosystem.sh
+
+# 8. Productividad interna (Wiki.js + Firefly III) - opcional
+cd compose/fase8-productividad && cp .env.example .env
+# generar FIREFLYIII_APP_KEY con el comando indicado en docs/FASE-8-productividad.md
+docker compose up -d
 ```
 
 ## Estado y credenciales
