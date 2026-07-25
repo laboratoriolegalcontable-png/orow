@@ -30,6 +30,10 @@ orden que convenga, sin arrastrar todo el stack de una.
 | 8 | `compose/fase8-productividad` | Wiki.js (base de conocimiento interna), Firefly III (finanzas propias del estudio) |
 | 9 | `compose/fase9-agenda-turnos` | EasyAppointments (agenda de turnos para consultas/visitas/reuniones) |
 
+**Antes de que algo se rompa, leer `docs/RECUPERACION-DESASTRES.md`** — el
+runbook de qué hacer si el servidor muere. Un backup que nadie sabe
+restaurar no sirve de nada.
+
 ## Herramientas de la propuesta original que NO están incluidas como Docker Compose
 
 Estas herramientas aparecían en el plan original pero **no encontré un paquete
