@@ -21,6 +21,12 @@ check() {
     fi
 }
 
+echo "=== Fase 0: Monitoreo y acceso ==="
+check "Nginx Proxy Manager"  "curl -sf http://localhost:81/"
+check "Netdata"              "curl -sf http://localhost:19999/api/v1/info"
+check "Dozzle"               "curl -sf http://localhost:8888/"
+
+echo ""
 echo "=== Fase 1: Infraestructura ==="
 check "Portainer"            "curl -skf https://localhost:9443"
 

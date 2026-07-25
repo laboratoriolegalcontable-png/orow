@@ -19,6 +19,7 @@ orden que convenga, sin arrastrar todo el stack de una.
 
 | Fase | Carpeta | Contenido |
 |---|---|---|
+| 0 | `compose/fase0-monitoreo-acceso` | Nginx Proxy Manager (único punto de entrada con TLS), Netdata (monitoreo), Dozzle (logs), Watchtower (auto-actualización) |
 | 1 | `compose/fase1-infraestructura` | Red Docker compartida + Portainer (UI de gestión). Coolify se instala aparte (ver abajo). |
 | 2 | `compose/fase2-legal` | Paperless-ngx (gestión documental + OCR), Stirling-PDF (edición de PDF), DocuSeal (firma digital) |
 | 3 | `compose/fase3-ia-local` | Ollama (modelos locales), Open WebUI (chat), Langflow (flujos visuales de IA) |
@@ -70,8 +71,11 @@ quiere construir uno propio.
 ## Orden de instalación
 
 ```bash
+# 0. Monitoreo y acceso (primero, para tener logs/monitoreo desde el arranque)
+cd compose/fase0-monitoreo-acceso && cp .env.example .env && docker compose up -d
+
 # 1. Red compartida + Portainer
-cd compose/fase1-infraestructura && cp .env.example .env && docker compose up -d
+cd ../fase1-infraestructura && cp .env.example .env && docker compose up -d
 
 # 2. Legal y documental
 cd ../fase2-legal && cp .env.example .env && docker compose up -d
