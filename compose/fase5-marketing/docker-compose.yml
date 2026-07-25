@@ -1,0 +1,31 @@
+name: oro-fase5-marketing
+
+networks:
+  oro-net:
+    external: true
+
+volumes:
+  n8n-data:
+
+services:
+  n8n:
+    image: docker.io/n8nio/n8n:latest
+    container_name: oro-n8n
+    restart: unless-stopped
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${N8N_PORT:-5678}:5678"
+    environment:
+      N8N_HOST: ${N8N_HOST:-localhost}
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_USER: ${N8N_BASIC_AUTH_USER:-admin}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_BASIC_AUTH_PASSWORD}
+      GENERIC_TIMEZONE: America/Argentina/Buenos_Aires
+    volumes:
+      - n8n-data:/home/node/.n8n
+    deploy:
+      resources:
+        limits:
+          memory: 1g

@@ -1,0 +1,27 @@
+name: oro-fase4-inmobiliaria
+
+networks:
+  oro-net:
+    external: true
+
+volumes:
+  inmobiliaria-db:
+
+services:
+  # Postgres 16 + pgvector compartido para el CRM/gestion de propiedades que
+  # se decida usar. Ver docs/FASE-4-inmobiliaria.md: el CRM en si (nombrado
+  # "Corredor" en el plan original) no tiene paquete Docker verificado.
+  inmobiliaria-db:
+    image: docker.io/pgvector/pgvector:pg16
+    container_name: oro-inmobiliaria-db
+    restart: unless-stopped
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${INMOBILIARIA_DB_PORT:-5433}:5432"
+    environment:
+      POSTGRES_DB: ${INMOBILIARIA_DB_NAME:-inmobiliaria}
+      POSTGRES_USER: ${INMOBILIARIA_DB_USER:-inmobiliaria}
+      POSTGRES_PASSWORD: ${INMOBILIARIA_DB_PASSWORD}
+    volumes:
+      - inmobiliaria-db:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d:ro

@@ -1,0 +1,33 @@
+{
+  "version": "1.0",
+  "fases_completadas": [],
+  "fase_actual": null,
+  "puertos_asignados": {
+    "portainer": 9443,
+    "paperless": 8010,
+    "stirling_pdf": 8011,
+    "docuseal": 3005,
+    "ollama": 11434,
+    "open_webui": 3000,
+    "langflow": 7860,
+    "inmobiliaria_db": 5433,
+    "n8n": 5678,
+    "mautic": 8012,
+    "authentik": 9000,
+    "vaultwarden": 8001,
+    "duplicati": 8200
+  },
+  "servicios": {},
+  "variables_compartidas": {
+    "OLLAMA_URL": "http://localhost:11434",
+    "POSTGRES_HOST_INMOBILIARIA": "localhost:5433",
+    "AUTHENTIK_URL": "http://localhost:9000",
+    "SMTP_CONFIG": null
+  },
+  "dependencias_pendientes": [
+    "Confirmar repo real para gestion de expedientes (OpenLex / Justicia 360)",
+    "Confirmar repo real para CRM inmobiliario (Corredor / alternativa)",
+    "Definir via de facturacion AFIP-ARCA (AfipSDK vs webservice directo)"
+  ],
+  "logs_instalacion": []
+}

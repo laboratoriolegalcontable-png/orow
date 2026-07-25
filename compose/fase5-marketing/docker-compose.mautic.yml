@@ -1,0 +1,45 @@
+# Overlay OPCIONAL — solo si el servidor tiene >4GB RAM libres reales.
+# Uso: docker compose -f docker-compose.yml -f docker-compose.mautic.yml up -d
+
+networks:
+  oro-net:
+    external: true
+
+volumes:
+  mautic-data:
+  mautic-db:
+
+services:
+  mautic-db:
+    image: docker.io/library/mysql:8.0
+    container_name: oro-mautic-db
+    restart: unless-stopped
+    networks: [oro-net]
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MAUTIC_DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: mautic
+      MYSQL_USER: mautic
+      MYSQL_PASSWORD: ${MAUTIC_DB_PASSWORD}
+    volumes:
+      - mautic-db:/var/lib/mysql
+
+  mautic:
+    image: docker.io/mautic/mautic:v5-apache
+    container_name: oro-mautic
+    restart: unless-stopped
+    depends_on:
+      - mautic-db
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${MAUTIC_PORT:-8012}:80"
+    environment:
+      MAUTIC_DB_HOST: mautic-db
+      MAUTIC_DB_NAME: mautic
+      MAUTIC_DB_USER: mautic
+      MAUTIC_DB_PASSWORD: ${MAUTIC_DB_PASSWORD}
+    volumes:
+      - mautic-data:/var/www/html
+    deploy:
+      resources:
+        limits:
+          memory: 2g

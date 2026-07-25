@@ -1,0 +1,8 @@
+# Secretos reales - nunca commitear
+.env
+compose/**/.env
+ecosystem-state.json
+
+# Sistema
+.DS_Store
+*.bak

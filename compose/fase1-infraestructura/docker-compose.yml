@@ -1,0 +1,22 @@
+name: oro-fase1-infra
+
+networks:
+  oro-net:
+    name: oro-net
+    driver: bridge
+
+volumes:
+  portainer-data:
+
+services:
+  portainer:
+    image: portainer/portainer-ce:2.21.4
+    container_name: oro-portainer
+    restart: unless-stopped
+    networks:
+      - oro-net
+    ports:
+      - "127.0.0.1:${PORTAINER_PORT:-9443}:9443"
+    volumes:
+      - portainer-data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
