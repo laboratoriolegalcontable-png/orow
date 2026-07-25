@@ -15,11 +15,13 @@ inmobiliario multi-tenant sincronizado con ZonaProp/Argenprop/Tokko, más un
 **"Real Estate MCP Server"** y opcionalmente **PropertyLoop**. Verifiqué los
 tres:
 
-- **Corredor / Property Manager 3.0**: no encontré un proyecto open-source
-  con ese nombre y esa descripción exacta con paquete Docker público. Puede
-  ser un nombre inventado, un producto muy nicho, o un typo de otra
-  herramienta — si el Doctor tiene el repo real, se agrega en minutos sobre
-  el Postgres que ya está levantado acá.
+- **Corredor / Property Manager 3.0**: **actualización tras verificación
+  puntual** — el repo existe (`martinmarquez/property-manager-3.0`), pero su
+  licencia es **"Proprietary — all rights reserved"**. No es open source pese
+  a como se presentó originalmente, así que no se puede autoinstalar como
+  software libre. Si el Doctor consigue una licencia comercial real de ese
+  proyecto, ahí sí se conecta al Postgres que ya está levantado acá — pero no
+  se clona/despliega sin esa autorización.
 - **PropertyLoop**: es un producto SaaS comercial del Reino Unido (no
   self-hosted, no open-source) — no aplica a un ecosistema self-hosted.
 - **Real Estate MCP Server**: "MCP server" describe una arquitectura (un
