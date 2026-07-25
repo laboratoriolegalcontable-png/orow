@@ -64,6 +64,16 @@ Assistant, Supabase self-hosteado vía CLI) **no se agregó** — mismos motivos
 que ya están documentados arriba y en `docs/FASE-3-ia-local.md` (Dify) /
 `docs/FASE-0-monitoreo-acceso.md` (por qué no Authelia).
 
+## Agenda de turnos: Cal.com evaluada y descartada a favor de EasyAppointments
+
+Cal.com es más conocida, pero su Docker es "mantenido por la comunidad,
+sin soporte oficial de Cal.com Inc.", sin imagen prearmada (hay que
+compilar el monorepo desde código fuente), y requiere SMTP configurado
+desde el arranque. **EasyAppointments** (`alextselegidis/easyappointments`)
+tiene imagen oficial real en Docker Hub del propio mantenedor, con MySQL,
+sin build — se instaló en su lugar (Fase 9). Ver
+`docs/FASE-9-agenda-turnos.md`.
+
 ## Explícitamente descartado (no es una cuestión de verificación de software)
 
 Se propuso además un módulo "Modo Espionaje / Inteligencia Legal" para

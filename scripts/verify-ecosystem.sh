@@ -65,6 +65,10 @@ check "Wiki.js"               "curl -sf http://localhost:3300/"
 check "Firefly III"           "curl -sf http://localhost:8060/"
 
 echo ""
+echo "=== Fase 9: Agenda de turnos ==="
+check "EasyAppointments"      "curl -sf http://localhost:8070/"
+
+echo ""
 echo "======================================"
 echo "Resultado: ${pass} OK / ${fail} fallo(s)"
 echo "======================================"

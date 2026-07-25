@@ -28,6 +28,7 @@ orden que convenga, sin arrastrar todo el stack de una.
 | 6 | `compose/fase6-seguridad` | Authentik (SSO), Vaultwarden (contraseñas), Duplicati (backups cifrados), Syncthing (sincronización a segundo destino) |
 | 7 | `scripts/verify-ecosystem.sh` | Script de verificación cruzada de todos los servicios activos |
 | 8 | `compose/fase8-productividad` | Wiki.js (base de conocimiento interna), Firefly III (finanzas propias del estudio) |
+| 9 | `compose/fase9-agenda-turnos` | EasyAppointments (agenda de turnos para consultas/visitas/reuniones) |
 
 ## Herramientas de la propuesta original que NO están incluidas como Docker Compose
 
@@ -117,6 +118,11 @@ cd "$ROOT" && ./scripts/verify-ecosystem.sh
 
 # 8. Productividad interna (Wiki.js + Firefly III) - opcional
 cd "$ROOT/compose/fase8-productividad" && cp .env.example .env
+"$ROOT/scripts/gen-secrets.sh" .env
+docker compose up -d
+
+# 9. Agenda de turnos (EasyAppointments)
+cd "$ROOT/compose/fase9-agenda-turnos" && cp .env.example .env
 "$ROOT/scripts/gen-secrets.sh" .env
 docker compose up -d
 ```

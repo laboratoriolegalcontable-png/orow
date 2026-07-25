@@ -22,7 +22,8 @@
     "duplicati": 8200,
     "syncthing_gui": 8384,
     "wikijs": 3300,
-    "fireflyiii": 8060
+    "fireflyiii": 8060,
+    "easyappointments": 8070
   },
   "servicios": {},
   "variables_compartidas": {

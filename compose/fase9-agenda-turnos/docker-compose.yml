@@ -1,0 +1,42 @@
+name: oro-fase9-agenda-turnos
+
+networks:
+  oro-net:
+    external: true
+
+volumes:
+  easyappointments-db:
+  easyappointments-storage:
+
+services:
+  easyappointments-db:
+    image: docker.io/library/mysql:8.0
+    container_name: oro-easyappointments-db
+    restart: unless-stopped
+    networks: [oro-net]
+    environment:
+      MYSQL_DATABASE: easyappointments
+      MYSQL_USER: easyappointments
+      MYSQL_PASSWORD: ${EASYAPPOINTMENTS_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${EASYAPPOINTMENTS_DB_ROOT_PASSWORD}
+    volumes:
+      - easyappointments-db:/var/lib/mysql
+
+  easyappointments:
+    image: docker.io/alextselegidis/easyappointments:latest
+    container_name: oro-easyappointments
+    restart: unless-stopped
+    depends_on:
+      - easyappointments-db
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${EASYAPPOINTMENTS_PORT:-8070}:80"
+    environment:
+      BASE_URL: ${EASYAPPOINTMENTS_URL:-http://localhost:8070}
+      DB_HOST: easyappointments-db
+      DB_NAME: easyappointments
+      DB_USERNAME: easyappointments
+      DB_PASSWORD: ${EASYAPPOINTMENTS_DB_PASSWORD}
+      DEBUG_MODE: "false"
+    volumes:
+      - easyappointments-storage:/var/www/html/storage
