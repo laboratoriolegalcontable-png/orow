@@ -48,6 +48,10 @@ job de backup desde la UI (`http://localhost:8200`):
 2. Elegir destino: S3, Google Drive, Backblaze B2, o local — Duplicati soporta
    los tres desde la UI sin configuración adicional en este repo
 3. Programar diario, con retención (ej. 30 días)
+4. En "Opciones avanzadas" del mismo job, agregar `--send-http-url` y
+   `--send-http-result-output-format=json` apuntando al webhook de n8n —
+   ver `n8n-workflows/README.md` (`backup-watchdog.json`) para que un
+   backup fallido avise solo, sin tener que revisar la UI todos los días.
 
 ## AFRelay / facturación AFIP-ARCA: no incluido, requiere clave fiscal real
 

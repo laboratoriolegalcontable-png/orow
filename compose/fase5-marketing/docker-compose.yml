@@ -60,6 +60,7 @@ services:
       N8N_BASIC_AUTH_USER: ${N8N_BASIC_AUTH_USER:-admin}
       N8N_BASIC_AUTH_PASSWORD: ${N8N_BASIC_AUTH_PASSWORD}
       GENERIC_TIMEZONE: America/Argentina/Buenos_Aires
+      ALERTA_WHATSAPP_WEBHOOK_URL: ${ALERTA_WHATSAPP_WEBHOOK_URL}
     volumes:
       - n8n-data:/home/node/.n8n
     deploy:
