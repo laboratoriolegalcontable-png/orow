@@ -1,5 +1,11 @@
 name: oro-fase0-monitoreo-acceso
 
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 networks:
   oro-net:
     external: true
@@ -20,6 +26,7 @@ services:
     image: docker.io/jc21/nginx-proxy-manager:latest
     container_name: oro-npm
     restart: unless-stopped
+    logging: *default-logging
     networks: [oro-net]
     ports:
       - "80:80"
@@ -34,6 +41,7 @@ services:
     image: docker.io/netdata/netdata:latest
     container_name: oro-netdata
     restart: unless-stopped
+    logging: *default-logging
     networks: [oro-net]
     ports:
       - "127.0.0.1:${NETDATA_PORT:-19999}:19999"
@@ -54,6 +62,7 @@ services:
     image: docker.io/amir20/dozzle:latest
     container_name: oro-dozzle
     restart: unless-stopped
+    logging: *default-logging
     networks: [oro-net]
     ports:
       - "127.0.0.1:${DOZZLE_PORT:-8888}:8080"
@@ -66,6 +75,7 @@ services:
     image: docker.io/containrrr/watchtower:latest
     container_name: oro-watchtower
     restart: unless-stopped
+    logging: *default-logging
     networks: [oro-net]
     environment:
       WATCHTOWER_CLEANUP: "true"

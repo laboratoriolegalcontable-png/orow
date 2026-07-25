@@ -153,3 +153,11 @@ secretos real en vez de archivos de texto plano.
   `docs/FASE-1-infraestructura.md`.
 - Buckets/documentos con datos de clientes (Paperless, DocuSeal) usan volúmenes
   named, no bind mounts a rutas públicas.
+
+## Optimización de recursos
+
+- Todos los `docker-compose.yml` (Fase 0 a 9) definen un ancla `x-logging` y la
+  aplican a cada servicio (`max-size: 10m`, `max-file: 3`). Sin esto, Docker
+  usa el driver `json-file` sin límite por defecto — en meses de uso los logs
+  de cada contenedor pueden crecer sin tope y llenar el disco sin que nadie lo
+  note hasta que un servicio falla por falta de espacio.

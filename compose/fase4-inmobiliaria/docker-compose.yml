@@ -1,5 +1,11 @@
 name: oro-fase4-inmobiliaria
 
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 networks:
   oro-net:
     external: true
@@ -15,6 +21,7 @@ services:
     image: docker.io/pgvector/pgvector:pg16
     container_name: oro-inmobiliaria-db
     restart: unless-stopped
+    logging: *default-logging
     networks: [oro-net]
     ports:
       - "127.0.0.1:${INMOBILIARIA_DB_PORT:-5433}:5432"

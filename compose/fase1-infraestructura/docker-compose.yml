@@ -1,5 +1,11 @@
 name: oro-fase1-infra
 
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 networks:
   oro-net:
     name: oro-net
@@ -13,6 +19,7 @@ services:
     image: portainer/portainer-ce:2.21.4
     container_name: oro-portainer
     restart: unless-stopped
+    logging: *default-logging
     networks:
       - oro-net
     ports:

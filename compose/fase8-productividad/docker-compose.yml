@@ -1,5 +1,11 @@
 name: oro-fase8-productividad
 
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 networks:
   oro-net:
     external: true
@@ -16,6 +22,7 @@ services:
     image: docker.io/library/postgres:16
     container_name: oro-wikijs-db
     restart: unless-stopped
+    logging: *default-logging
     networks: [oro-net]
     environment:
       POSTGRES_DB: wikijs
@@ -28,6 +35,7 @@ services:
     image: ghcr.io/requarks/wiki:2
     container_name: oro-wikijs
     restart: unless-stopped
+    logging: *default-logging
     depends_on:
       - wikijs-db
     networks: [oro-net]
@@ -46,6 +54,7 @@ services:
     image: docker.io/library/postgres:16
     container_name: oro-fireflyiii-db
     restart: unless-stopped
+    logging: *default-logging
     networks: [oro-net]
     environment:
       POSTGRES_DB: firefly
@@ -58,6 +67,7 @@ services:
     image: docker.io/fireflyiii/core:latest
     container_name: oro-fireflyiii
     restart: unless-stopped
+    logging: *default-logging
     depends_on:
       - fireflyiii-db
     networks: [oro-net]
