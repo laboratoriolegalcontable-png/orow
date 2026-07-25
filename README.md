@@ -71,38 +71,53 @@ quiere construir uno propio.
 
 ## Orden de instalación
 
+Cada fase sigue el mismo patrón: copiar `.env.example` a `.env`, correr
+`scripts/gen-secrets.sh` para reemplazar los `CHANGE_ME_*` por valores
+aleatorios reales, y recién ahí `docker compose up -d`.
+
 ```bash
+ROOT=$(pwd)   # raiz del repo clonado en el servidor
+
 # 0. Monitoreo y acceso (primero, para tener logs/monitoreo desde el arranque)
 cd compose/fase0-monitoreo-acceso && cp .env.example .env && docker compose up -d
+# (Fase 0 no tiene CHANGE_ME_ en su .env.example, no necesita gen-secrets.sh)
 
 # 1. Red compartida + Portainer
-cd ../fase1-infraestructura && cp .env.example .env && docker compose up -d
+cd "$ROOT/compose/fase1-infraestructura" && cp .env.example .env && docker compose up -d
 
 # 2. Legal y documental
-cd ../fase2-legal && cp .env.example .env && docker compose up -d
+cd "$ROOT/compose/fase2-legal" && cp .env.example .env
+"$ROOT/scripts/gen-secrets.sh" .env
+docker compose up -d
 
 # 3. IA local (Ollama primero, Open WebUI depende de él)
-cd ../fase3-ia-local && cp .env.example .env && docker compose up -d
+cd "$ROOT/compose/fase3-ia-local" && cp .env.example .env
+"$ROOT/scripts/gen-secrets.sh" .env
+docker compose up -d
 docker compose exec ollama ollama pull llama3.2:3b
 
 # 4. Postgres inmobiliario
-cd ../fase4-inmobiliaria && cp .env.example .env && docker compose up -d
+cd "$ROOT/compose/fase4-inmobiliaria" && cp .env.example .env
+"$ROOT/scripts/gen-secrets.sh" .env
+docker compose up -d
 
 # 5. Marketing
-cd ../fase5-marketing && cp .env.example .env && docker compose up -d
+cd "$ROOT/compose/fase5-marketing" && cp .env.example .env
+"$ROOT/scripts/gen-secrets.sh" .env
+docker compose up -d
 
-# 6. Seguridad (Authentik necesita generar sus propias claves antes del primer arranque)
-cd ../fase6-seguridad && cp .env.example .env
-./generate-authentik-secrets.sh   # completa AUTHENTIK_SECRET_KEY en .env
+# 6. Seguridad (Authentik necesita su propio script de claves antes del resto)
+cd "$ROOT/compose/fase6-seguridad" && cp .env.example .env
+./generate-authentik-secrets.sh    # completa AUTHENTIK_SECRET_KEY
+"$ROOT/scripts/gen-secrets.sh" .env   # completa el resto (Vaultwarden, Duplicati)
 docker compose up -d
 
 # 7. Verificación cruzada
-cd /workspace/orosa-nexus  # o donde esté clonado en el servidor
-./scripts/verify-ecosystem.sh
+cd "$ROOT" && ./scripts/verify-ecosystem.sh
 
 # 8. Productividad interna (Wiki.js + Firefly III) - opcional
-cd compose/fase8-productividad && cp .env.example .env
-# generar FIREFLYIII_APP_KEY con el comando indicado en docs/FASE-8-productividad.md
+cd "$ROOT/compose/fase8-productividad" && cp .env.example .env
+"$ROOT/scripts/gen-secrets.sh" .env
 docker compose up -d
 ```
 

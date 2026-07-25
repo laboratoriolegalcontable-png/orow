@@ -20,7 +20,12 @@ TMP_FILE=$(mktemp)
 while IFS= read -r line; do
     if [[ "$line" =~ ^([A-Z0-9_]+)=CHANGE_ME ]]; then
         key="${BASH_REMATCH[1]}"
-        value=$(openssl rand -hex 24)
+        # Firefly III (Fase 8) usa el formato APP_KEY de Laravel, no un hex generico.
+        if [ "$key" = "FIREFLYIII_APP_KEY" ]; then
+            value="base64:$(openssl rand -base64 32)"
+        else
+            value=$(openssl rand -hex 24)
+        fi
         echo "${key}=${value}" >> "$TMP_FILE"
         echo "Generado: ${key}"
     else

@@ -8,6 +8,22 @@ Un Postgres 16 con la extensión `pgvector` habilitada (imagen oficial
 Esto es real y funcional: se puede insertar, buscar y consultar propiedades
 desde ya.
 
+## Pendiente: conectar a Supabase en vez de este Postgres local
+
+Se evaluó conectar esta fase directamente al proyecto Supabase existente
+(`moljmujlfvtsgkjbtwss`, donde ya corren los bots NARAKIA) en vez de un
+Postgres nuevo. Al revisar, ese Supabase **ya tiene un ecosistema
+inmobiliario propio en producción**: tablas `propiedades`, `inmuebles`,
+`megan_properties`, `oroprop_leads/favorites/shortlists`,
+`real_estate_leads` — cada una sirviendo a un bot o app distinto, ninguna
+con columna de embeddings todavía.
+
+Queda pendiente confirmar **cuál de esas tablas** (probablemente
+`propiedades`, que tiene los campos de due diligence) es la indicada antes
+de tocar nada en producción. El script de migración ya está preparado y
+revisado, sin aplicar, en
+`docs/migrations-pendientes/propiedades-embeddings.sql`.
+
 ## Lo que NO se instala (y por qué)
 
 El plan original pedía **"Corredor (Property Manager 3.0)"** como CRM
