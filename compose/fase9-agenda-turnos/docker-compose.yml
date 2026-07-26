@@ -28,6 +28,11 @@ services:
       MYSQL_ROOT_PASSWORD: ${EASYAPPOINTMENTS_DB_ROOT_PASSWORD}
     volumes:
       - easyappointments-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${EASYAPPOINTMENTS_DB_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   easyappointments:
     image: docker.io/alextselegidis/easyappointments:latest
@@ -35,7 +40,8 @@ services:
     restart: unless-stopped
     logging: *default-logging
     depends_on:
-      - easyappointments-db
+      easyappointments-db:
+        condition: service_healthy
     networks: [oro-net]
     ports:
       - "127.0.0.1:${EASYAPPOINTMENTS_PORT:-8070}:80"
