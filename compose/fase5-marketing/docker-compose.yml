@@ -30,6 +30,11 @@ services:
       MARIADB_ROOT_PASSWORD: ${MATOMO_DB_ROOT_PASSWORD}
     volumes:
       - matomo-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   matomo:
     image: docker.io/library/matomo:latest
@@ -37,7 +42,8 @@ services:
     restart: unless-stopped
     logging: *default-logging
     depends_on:
-      - matomo-db
+      matomo-db:
+        condition: service_healthy
     networks: [oro-net]
     ports:
       - "127.0.0.1:${MATOMO_PORT:-8050}:80"

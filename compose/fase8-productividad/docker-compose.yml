@@ -30,6 +30,11 @@ services:
       POSTGRES_PASSWORD: ${WIKIJS_DB_PASSWORD}
     volumes:
       - wikijs-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wikijs -d wikijs"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   wikijs:
     image: ghcr.io/requarks/wiki:2
@@ -37,7 +42,8 @@ services:
     restart: unless-stopped
     logging: *default-logging
     depends_on:
-      - wikijs-db
+      wikijs-db:
+        condition: service_healthy
     networks: [oro-net]
     ports:
       - "127.0.0.1:${WIKIJS_PORT:-3300}:3000"
@@ -62,6 +68,11 @@ services:
       POSTGRES_PASSWORD: ${FIREFLYIII_DB_PASSWORD}
     volumes:
       - fireflyiii-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U firefly -d firefly"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   fireflyiii:
     image: docker.io/fireflyiii/core:latest
@@ -69,7 +80,8 @@ services:
     restart: unless-stopped
     logging: *default-logging
     depends_on:
-      - fireflyiii-db
+      fireflyiii-db:
+        condition: service_healthy
     networks: [oro-net]
     ports:
       - "127.0.0.1:${FIREFLYIII_PORT:-8060}:8080"

@@ -34,6 +34,11 @@ services:
       POSTGRES_PASSWORD: ${AUTHENTIK_DB_PASSWORD}
     volumes:
       - authentik-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U authentik -d authentik"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   authentik-redis:
     image: docker.io/library/redis:7
@@ -49,8 +54,10 @@ services:
     logging: *default-logging
     command: server
     depends_on:
-      - authentik-db
-      - authentik-redis
+      authentik-db:
+        condition: service_healthy
+      authentik-redis:
+        condition: service_started
     networks: [oro-net]
     ports:
       - "127.0.0.1:${AUTHENTIK_PORT:-9000}:9000"
@@ -74,8 +81,10 @@ services:
     logging: *default-logging
     command: worker
     depends_on:
-      - authentik-db
-      - authentik-redis
+      authentik-db:
+        condition: service_healthy
+      authentik-redis:
+        condition: service_started
     networks: [oro-net]
     environment:
       AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
