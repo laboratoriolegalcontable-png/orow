@@ -8,7 +8,8 @@ x-logging: &default-logging
 
 networks:
   oro-net:
-    external: true
+    name: oro-net
+    driver: bridge
 
 volumes:
   npm-data:
@@ -72,7 +73,7 @@ services:
   # --- Watchtower: actualiza automaticamente las imagenes con nueva version ---
   # Corre en horario nocturno para no interrumpir el uso del estudio en horario laboral.
   watchtower:
-    image: docker.io/containrrr/watchtower:latest
+    image: docker.io/nickfedor/watchtower:latest
     container_name: oro-watchtower
     restart: unless-stopped
     logging: *default-logging

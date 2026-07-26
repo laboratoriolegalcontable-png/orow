@@ -11,11 +11,22 @@ por algo concreto y ya armado.
 | Nginx Proxy Manager | `jc21/nginx-proxy-manager` | 80/443 (público), 81 (admin) | Único punto de entrada con TLS (Let's Encrypt) hacia los servicios que se decida exponer a internet |
 | Netdata | `netdata/netdata` | 19999 | Monitoreo de CPU/RAM/disco del servidor en tiempo real |
 | Dozzle | `amir20/dozzle` | 8888 | Ver logs de todos los contenedores desde el navegador, sin `docker logs` por SSH |
-| Watchtower | `containrrr/watchtower` | — (sin UI) | Actualiza automáticamente las imágenes cuando sale una versión nueva, de madrugada (4am) |
+| Watchtower | `nickfedor/watchtower` | — (sin UI) | Actualiza automáticamente las imágenes cuando sale una versión nueva, de madrugada (4am) |
 
 Estas cuatro salieron de la verificación en
 `docs/VERIFICACION-HERRAMIENTAS-MARKETING.md` — proyectos conocidos, activos,
 con imagen Docker oficial.
+
+**Nota (26/07/2026):** `containrrr/watchtower` (la imagen original) quedó
+**archivada en diciembre 2025** — los mantenedores dejaron de usar Docker y
+el repo pasó a solo lectura, sin más parches. Con un Docker Engine moderno
+(API 1.40+) la imagen original falla con `client version 1.25 is too old`.
+Se usa `nickfedor/watchtower`, el fork activo y compatible 1-a-1 recomendado
+por la comunidad tras el archivado.
+
+**Esta fase crea la red compartida `oro-net`** (no la asume como externa) —
+es la primera fase que se instala, así que tiene que ser la que la crea; las
+fases 1 en adelante la referencian como `external: true`.
 
 ## Por qué NO se suma Authelia acá
 

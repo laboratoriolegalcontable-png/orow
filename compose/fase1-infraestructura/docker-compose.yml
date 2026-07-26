@@ -8,8 +8,7 @@ x-logging: &default-logging
 
 networks:
   oro-net:
-    name: oro-net
-    driver: bridge
+    external: true
 
 volumes:
   portainer-data:
