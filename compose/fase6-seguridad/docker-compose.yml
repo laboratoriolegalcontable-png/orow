@@ -100,7 +100,8 @@ services:
       - "127.0.0.1:${VAULTWARDEN_PORT:-8001}:80"
     environment:
       ADMIN_TOKEN: ${VAULTWARDEN_ADMIN_TOKEN}
-      SIGNUPS_ALLOWED: "false"
+      DOMAIN: ${VAULTWARDEN_DOMAIN:-http://localhost:8080}
+      SIGNUPS_ALLOWED: ${VAULTWARDEN_SIGNUPS_ALLOWED:-false}
     volumes:
       - vaultwarden-data:/data
 
