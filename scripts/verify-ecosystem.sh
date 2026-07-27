@@ -63,6 +63,7 @@ echo ""
 echo "=== Fase 8: Productividad interna ==="
 check "Wiki.js"               "curl -sf http://localhost:3300/"
 check "Firefly III"           "curl -sf http://localhost:8060/"
+check "Planka"                "curl -sf http://localhost:3400/"
 
 echo ""
 echo "=== Fase 9: Agenda de turnos ==="

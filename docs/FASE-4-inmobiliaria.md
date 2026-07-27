@@ -8,21 +8,31 @@ Un Postgres 16 con la extensión `pgvector` habilitada (imagen oficial
 Esto es real y funcional: se puede insertar, buscar y consultar propiedades
 desde ya.
 
-## Pendiente: conectar a Supabase en vez de este Postgres local
+## Conectado a Supabase — `propiedades` ya tiene embeddings (aplicado)
 
 Se evaluó conectar esta fase directamente al proyecto Supabase existente
 (`moljmujlfvtsgkjbtwss`, donde ya corren los bots NARAKIA) en vez de un
-Postgres nuevo. Al revisar, ese Supabase **ya tiene un ecosistema
-inmobiliario propio en producción**: tablas `propiedades`, `inmuebles`,
-`megan_properties`, `oroprop_leads/favorites/shortlists`,
-`real_estate_leads` — cada una sirviendo a un bot o app distinto, ninguna
-con columna de embeddings todavía.
+Postgres nuevo. Ese Supabase **ya tiene un ecosistema inmobiliario propio
+en producción**: tablas `propiedades`, `inmuebles`, `megan_properties`,
+`oroprop_leads/favorites/shortlists`, `real_estate_leads` — cada una
+sirviendo a un bot o app distinto.
 
-Queda pendiente confirmar **cuál de esas tablas** (probablemente
-`propiedades`, que tiene los campos de due diligence) es la indicada antes
-de tocar nada en producción. El script de migración ya está preparado y
-revisado, sin aplicar, en
-`docs/migrations-pendientes/propiedades-embeddings.sql`.
+El Doctor confirmó `propiedades` (tiene los campos de due diligence) como
+la tabla indicada. Se aplicó la migración de
+`docs/migrations-pendientes/propiedades-embeddings.sql` directo a
+producción — la tabla tenía 0 filas al momento de aplicarla, así que no
+había datos en riesgo, y el cambio es aditivo (columna `descripcion_embedding
+vector(1536)` + índice `ivfflat`, sin tocar ninguna columna existente).
+`get_advisors` (security) no reportó problemas nuevos sobre `propiedades`.
+
+**Pendiente todavía**: generar los vectores reales. La migración deja la
+columna vacía — falta decidir el modelo de embeddings (Ollama local, ya
+levantado en Fase 3, vs una API externa) y escribir el proceso que los
+calcule a partir de `descripcion` para cada fila nueva/existente.
+
+El Postgres + pgvector local de esta fase (`inmobiliaria-db`) sigue
+levantado como entorno de desarrollo/pruebas — no se borra, pero la fuente
+de verdad en producción es Supabase.
 
 ## Lo que NO se instala (y por qué)
 

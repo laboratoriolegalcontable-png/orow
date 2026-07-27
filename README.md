@@ -27,7 +27,7 @@ orden que convenga, sin arrastrar todo el stack de una.
 | 5 | `compose/fase5-marketing` | n8n (automatización), Matomo (analytics), Mautic (email marketing, opcional/pesado) |
 | 6 | `compose/fase6-seguridad` | Authentik (SSO), Vaultwarden (contraseñas), Duplicati (backups cifrados), Syncthing (sincronización a segundo destino) |
 | 7 | `scripts/verify-ecosystem.sh` | Script de verificación cruzada de todos los servicios activos |
-| 8 | `compose/fase8-productividad` | Wiki.js (base de conocimiento interna), Firefly III (finanzas propias del estudio) |
+| 8 | `compose/fase8-productividad` | Wiki.js (base de conocimiento interna), Firefly III (finanzas propias del estudio), Planka (Kanban de proyectos inmobiliarios, no de expedientes) |
 | 9 | `compose/fase9-agenda-turnos` | EasyAppointments (agenda de turnos para consultas/visitas/reuniones) |
 
 **Antes de que algo se rompa, leer `docs/RECUPERACION-DESASTRES.md`** — el
