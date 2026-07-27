@@ -1,0 +1,151 @@
+name: oro-fase8-productividad
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+networks:
+  oro-net:
+    external: true
+
+volumes:
+  wikijs-db:
+  fireflyiii-db:
+  fireflyiii-data:
+  fireflyiii-export:
+  planka-db:
+  planka-user-avatars:
+  planka-project-background-images:
+  planka-attachments:
+
+services:
+  # --- Wiki.js: base de conocimiento interna (procedimientos, plantillas) ---
+  wikijs-db:
+    image: docker.io/library/postgres:16
+    container_name: oro-wikijs-db
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [oro-net]
+    environment:
+      POSTGRES_DB: wikijs
+      POSTGRES_USER: wikijs
+      POSTGRES_PASSWORD: ${WIKIJS_DB_PASSWORD}
+    volumes:
+      - wikijs-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wikijs -d wikijs"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  wikijs:
+    image: ghcr.io/requarks/wiki:2
+    container_name: oro-wikijs
+    restart: unless-stopped
+    logging: *default-logging
+    depends_on:
+      wikijs-db:
+        condition: service_healthy
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${WIKIJS_PORT:-3300}:3000"
+    environment:
+      DB_TYPE: postgres
+      DB_HOST: wikijs-db
+      DB_PORT: 5432
+      DB_NAME: wikijs
+      DB_USER: wikijs
+      DB_PASS: ${WIKIJS_DB_PASSWORD}
+
+  # --- Firefly III: contabilidad/finanzas propias del estudio (no facturacion a clientes) ---
+  fireflyiii-db:
+    image: docker.io/library/postgres:16
+    container_name: oro-fireflyiii-db
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [oro-net]
+    environment:
+      POSTGRES_DB: firefly
+      POSTGRES_USER: firefly
+      POSTGRES_PASSWORD: ${FIREFLYIII_DB_PASSWORD}
+    volumes:
+      - fireflyiii-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U firefly -d firefly"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  fireflyiii:
+    image: docker.io/fireflyiii/core:latest
+    container_name: oro-fireflyiii
+    restart: unless-stopped
+    logging: *default-logging
+    depends_on:
+      fireflyiii-db:
+        condition: service_healthy
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${FIREFLYIII_PORT:-8060}:8080"
+    environment:
+      APP_KEY: ${FIREFLYIII_APP_KEY}
+      DB_CONNECTION: pgsql
+      DB_HOST: fireflyiii-db
+      DB_PORT: 5432
+      DB_DATABASE: firefly
+      DB_USERNAME: firefly
+      DB_PASSWORD: ${FIREFLYIII_DB_PASSWORD}
+      APP_URL: ${FIREFLYIII_URL:-http://localhost:8060}
+      TZ: America/Argentina/Buenos_Aires
+    volumes:
+      - fireflyiii-data:/var/www/html/storage/upload
+      - fireflyiii-export:/var/www/html/storage/export
+
+  # --- Planka: Kanban acotado a proyectos/desarrollos inmobiliarios ---
+  # NO es para expedientes judiciales ni estado de casos - eso vive en
+  # OroGest/NARAKIA (Supabase). Ver docs/FASE-8-productividad.md.
+  planka-db:
+    image: docker.io/library/postgres:16-alpine
+    container_name: oro-planka-db
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [oro-net]
+    environment:
+      POSTGRES_DB: planka
+      POSTGRES_USER: planka
+      POSTGRES_PASSWORD: ${PLANKA_DB_PASSWORD}
+    volumes:
+      - planka-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U planka -d planka"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  planka:
+    image: ghcr.io/plankanban/planka:latest
+    container_name: oro-planka
+    restart: unless-stopped
+    logging: *default-logging
+    depends_on:
+      planka-db:
+        condition: service_healthy
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${PLANKA_PORT:-3400}:1337"
+    environment:
+      BASE_URL: ${PLANKA_URL:-http://localhost:3400}
+      DATABASE_URL: postgresql://planka:${PLANKA_DB_PASSWORD}@planka-db/planka
+      SECRET_KEY: ${PLANKA_SECRET_KEY}
+      # Solo se usan para crear el primer admin - sacarlas del .env despues
+      # del primer arranque (ver docs/FASE-8-productividad.md).
+      DEFAULT_ADMIN_EMAIL: ${PLANKA_ADMIN_EMAIL:-admin@estudiooro.com.ar}
+      DEFAULT_ADMIN_USERNAME: ${PLANKA_ADMIN_USERNAME:-admin}
+      DEFAULT_ADMIN_NAME: ${PLANKA_ADMIN_NAME:-Estudio Oro}
+      DEFAULT_ADMIN_PASSWORD: ${PLANKA_ADMIN_PASSWORD}
+    volumes:
+      - planka-user-avatars:/app/public/user-avatars
+      - planka-project-background-images:/app/public/project-background-images
+      - planka-attachments:/app/private/attachments

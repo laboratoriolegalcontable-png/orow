@@ -1,0 +1,150 @@
+name: oro-fase6-seguridad
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+networks:
+  oro-net:
+    external: true
+
+volumes:
+  authentik-db:
+  authentik-redis:
+  authentik-media:
+  authentik-templates:
+  vaultwarden-data:
+  duplicati-data:
+  duplicati-config:
+  syncthing-data:
+
+services:
+  # --- Authentik: SSO / proveedor OAuth2 para el resto de los servicios ---
+  authentik-db:
+    image: docker.io/library/postgres:16
+    container_name: oro-authentik-db
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [oro-net]
+    environment:
+      POSTGRES_DB: authentik
+      POSTGRES_USER: authentik
+      POSTGRES_PASSWORD: ${AUTHENTIK_DB_PASSWORD}
+    volumes:
+      - authentik-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U authentik -d authentik"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  authentik-redis:
+    image: docker.io/library/redis:7
+    container_name: oro-authentik-redis
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [oro-net]
+
+  authentik-server:
+    image: ghcr.io/goauthentik/server:2024.10
+    container_name: oro-authentik-server
+    restart: unless-stopped
+    logging: *default-logging
+    command: server
+    depends_on:
+      authentik-db:
+        condition: service_healthy
+      authentik-redis:
+        condition: service_started
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${AUTHENTIK_PORT:-9000}:9000"
+    environment:
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+      AUTHENTIK_REDIS__HOST: authentik-redis
+      AUTHENTIK_POSTGRESQL__HOST: authentik-db
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_DB_PASSWORD}
+      AUTHENTIK_BOOTSTRAP_EMAIL: ${AUTHENTIK_BOOTSTRAP_EMAIL}
+      AUTHENTIK_BOOTSTRAP_PASSWORD: ${AUTHENTIK_BOOTSTRAP_PASSWORD}
+    volumes:
+      - authentik-media:/media
+      - authentik-templates:/templates
+
+  authentik-worker:
+    image: ghcr.io/goauthentik/server:2024.10
+    container_name: oro-authentik-worker
+    restart: unless-stopped
+    logging: *default-logging
+    command: worker
+    depends_on:
+      authentik-db:
+        condition: service_healthy
+      authentik-redis:
+        condition: service_started
+    networks: [oro-net]
+    environment:
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+      AUTHENTIK_REDIS__HOST: authentik-redis
+      AUTHENTIK_POSTGRESQL__HOST: authentik-db
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_DB_PASSWORD}
+    volumes:
+      - authentik-media:/media
+      - authentik-templates:/templates
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  # --- Vaultwarden: gestor de contraseñas (Bitwarden-compatible) ---
+  vaultwarden:
+    image: docker.io/vaultwarden/server:latest
+    container_name: oro-vaultwarden
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${VAULTWARDEN_PORT:-8001}:80"
+    environment:
+      ADMIN_TOKEN: ${VAULTWARDEN_ADMIN_TOKEN}
+      DOMAIN: ${VAULTWARDEN_DOMAIN:-http://localhost:8080}
+      SIGNUPS_ALLOWED: ${VAULTWARDEN_SIGNUPS_ALLOWED:-false}
+    volumes:
+      - vaultwarden-data:/data
+
+  # --- Duplicati: backups cifrados de los volumenes de Docker ---
+  duplicati:
+    image: docker.io/duplicati/duplicati:latest
+    container_name: oro-duplicati
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${DUPLICATI_PORT:-8200}:8200"
+    environment:
+      SETTINGS_ENCRYPTION_KEY: ${DUPLICATI_SETTINGS_KEY}
+      DUPLICATI__WEBSERVICE_PASSWORD: ${DUPLICATI_WEB_PASSWORD}
+    volumes:
+      - duplicati-config:/data
+      - duplicati-data:/backups
+      - /var/lib/docker/volumes:/source/docker-volumes:ro
+
+  # --- Syncthing: sincronizacion de archivos hacia un segundo destino ---
+  # Complementa a Duplicati: un segundo lugar (otra maquina/NAS del Doctor,
+  # no necesariamente en la nube) donde queden copias de los backups.
+  syncthing:
+    image: docker.io/syncthing/syncthing:latest
+    container_name: oro-syncthing
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${SYNCTHING_GUI_PORT:-8384}:8384"
+      - "22000:22000/tcp"
+      - "22000:22000/udp"
+      - "21027:21027/udp"
+    volumes:
+      - syncthing-data:/var/syncthing
+      - duplicati-data:/var/syncthing/backups-duplicati:ro

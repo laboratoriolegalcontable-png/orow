@@ -1,0 +1,86 @@
+name: oro-fase0-monitoreo-acceso
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+networks:
+  oro-net:
+    name: oro-net
+    driver: bridge
+
+volumes:
+  npm-data:
+  npm-letsencrypt:
+  netdata-config:
+  netdata-lib:
+  netdata-cache:
+
+services:
+  # --- Nginx Proxy Manager: reverse proxy con TLS (Let's Encrypt) y UI web ---
+  # Punto de entrada unico a los servicios que se decida exponer a internet.
+  # El resto de las fases escuchan solo en 127.0.0.1 - esto es lo unico que
+  # deberia tener puertos 80/443 abiertos al mundo.
+  nginx-proxy-manager:
+    image: docker.io/jc21/nginx-proxy-manager:latest
+    container_name: oro-npm
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [oro-net]
+    ports:
+      - "80:80"
+      - "443:443"
+      - "127.0.0.1:${NPM_ADMIN_PORT:-81}:81"
+    volumes:
+      - npm-data:/data
+      - npm-letsencrypt:/etc/letsencrypt
+
+  # --- Netdata: monitoreo de recursos del servidor en tiempo real ---
+  netdata:
+    image: docker.io/netdata/netdata:latest
+    container_name: oro-netdata
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${NETDATA_PORT:-19999}:19999"
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - netdata-config:/etc/netdata
+      - netdata-lib:/var/lib/netdata
+      - netdata-cache:/var/cache/netdata
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  # --- Dozzle: visor de logs de todos los contenedores en tiempo real ---
+  dozzle:
+    image: docker.io/amir20/dozzle:latest
+    container_name: oro-dozzle
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${DOZZLE_PORT:-8888}:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  # --- Watchtower: actualiza automaticamente las imagenes con nueva version ---
+  # Corre en horario nocturno para no interrumpir el uso del estudio en horario laboral.
+  watchtower:
+    image: docker.io/nickfedor/watchtower:latest
+    container_name: oro-watchtower
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [oro-net]
+    environment:
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_SCHEDULE: "0 0 4 * * *"
+      WATCHTOWER_NOTIFICATIONS: ""
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

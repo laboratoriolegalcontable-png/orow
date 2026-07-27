@@ -1,0 +1,84 @@
+name: oro-fase5-marketing
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+networks:
+  oro-net:
+    external: true
+
+volumes:
+  n8n-data:
+  matomo-data:
+  matomo-db:
+
+services:
+  # --- Matomo: analytics propio (alternativa a Google Analytics) ---
+  matomo-db:
+    image: docker.io/library/mariadb:11
+    container_name: oro-matomo-db
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [oro-net]
+    environment:
+      MARIADB_DATABASE: matomo
+      MARIADB_USER: matomo
+      MARIADB_PASSWORD: ${MATOMO_DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MATOMO_DB_ROOT_PASSWORD}
+    volumes:
+      - matomo-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  matomo:
+    image: docker.io/library/matomo:latest
+    container_name: oro-matomo
+    restart: unless-stopped
+    logging: *default-logging
+    depends_on:
+      matomo-db:
+        condition: service_healthy
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${MATOMO_PORT:-8050}:80"
+    environment:
+      MATOMO_DATABASE_HOST: matomo-db
+      MATOMO_DATABASE_USERNAME: matomo
+      MATOMO_DATABASE_PASSWORD: ${MATOMO_DB_PASSWORD}
+      MATOMO_DATABASE_DBNAME: matomo
+    volumes:
+      - matomo-data:/var/www/html
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+  n8n:
+    image: docker.io/n8nio/n8n:latest
+    container_name: oro-n8n
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${N8N_PORT:-5678}:5678"
+    environment:
+      N8N_HOST: ${N8N_HOST:-localhost}
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_USER: ${N8N_BASIC_AUTH_USER:-admin}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_BASIC_AUTH_PASSWORD}
+      GENERIC_TIMEZONE: America/Argentina/Buenos_Aires
+      ALERTA_WHATSAPP_WEBHOOK_URL: ${ALERTA_WHATSAPP_WEBHOOK_URL}
+    volumes:
+      - n8n-data:/home/node/.n8n
+    deploy:
+      resources:
+        limits:
+          memory: 1g

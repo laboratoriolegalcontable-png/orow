@@ -1,0 +1,28 @@
+name: oro-fase1-infra
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+networks:
+  oro-net:
+    external: true
+
+volumes:
+  portainer-data:
+
+services:
+  portainer:
+    image: portainer/portainer-ce:2.21.4
+    container_name: oro-portainer
+    restart: unless-stopped
+    logging: *default-logging
+    networks:
+      - oro-net
+    ports:
+      - "127.0.0.1:${PORTAINER_PORT:-9443}:9443"
+    volumes:
+      - portainer-data:/data
+      - /var/run/docker.sock:/var/run/docker.sock

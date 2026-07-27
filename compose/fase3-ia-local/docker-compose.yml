@@ -1,0 +1,71 @@
+name: oro-fase3-ia-local
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+networks:
+  oro-net:
+    external: true
+
+volumes:
+  ollama-data:
+  open-webui-data:
+  langflow-data:
+
+services:
+  ollama:
+    image: docker.io/ollama/ollama:latest
+    container_name: oro-ollama
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: oro-open-webui
+    restart: unless-stopped
+    logging: *default-logging
+    depends_on:
+      - ollama
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${OPEN_WEBUI_PORT:-3000}:8080"
+    environment:
+      OLLAMA_BASE_URL: http://ollama:11434
+      WEBUI_SECRET_KEY: ${OPEN_WEBUI_SECRET_KEY}
+    volumes:
+      - open-webui-data:/app/backend/data
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+
+  langflow:
+    image: docker.io/langflowai/langflow:latest
+    container_name: oro-langflow
+    restart: unless-stopped
+    logging: *default-logging
+    networks: [oro-net]
+    ports:
+      - "127.0.0.1:${LANGFLOW_PORT:-7860}:7860"
+    environment:
+      LANGFLOW_SUPERUSER: ${LANGFLOW_SUPERUSER:-admin}
+      LANGFLOW_SUPERUSER_PASSWORD: ${LANGFLOW_SUPERUSER_PASSWORD}
+      LANGFLOW_AUTO_LOGIN: "false"
+    volumes:
+      - langflow-data:/app/langflow
+    deploy:
+      resources:
+        limits:
+          memory: 2g

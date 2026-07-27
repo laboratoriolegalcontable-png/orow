@@ -1,0 +1,128 @@
+{
+  "name": "El Gran Juicio - Simulador de argumentos (preparacion interna)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "el-gran-juicio",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Recibir caso",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://ollama:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"llama3.2:3b\", stream: false, system: \"Sos un abogado especialista en derecho civil y comercial (CCCN). Analiza los hechos que te pasan y desarrolla los argumentos civiles/comerciales mas solidos a favor de la posicion del estudio, citando los articulos del CCCN que correspondan. Se tecnico y concreto, no uses lenguaje de combate ni menciones a personas reales.\", prompt: $json.body.caso }) }}",
+        "options": {}
+      },
+      "id": "perspectiva-civil",
+      "name": "Perspectiva Civil/Comercial",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [250, 100]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://ollama:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"llama3.2:3b\", stream: false, system: \"Sos un abogado penalista defensor. Analiza los hechos que te pasan y desarrolla los argumentos de defensa penal mas solidos (nulidades procesales, falta de prueba, prescripcion si aplica), citando el CPPN/CPP que corresponda segun la jurisdiccion mencionada. Se tecnico y concreto, no uses lenguaje de combate ni menciones a personas reales.\", prompt: $json.body.caso }) }}",
+        "options": {}
+      },
+      "id": "perspectiva-penal",
+      "name": "Perspectiva Penal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://ollama:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"llama3.2:3b\", stream: false, system: \"Sos un abogado laboralista. Analiza los hechos que te pasan y desarrolla los argumentos laborales relevantes (LCT, indemnizaciones, relacion de dependencia si aplica). Se tecnico y concreto, no uses lenguaje de combate ni menciones a personas reales.\", prompt: $json.body.caso }) }}",
+        "options": {}
+      },
+      "id": "perspectiva-laboral",
+      "name": "Perspectiva Laboral",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [250, 500]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "merge-perspectivas",
+      "name": "Unir perspectivas",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://ollama:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"llama3.2:3b\", stream: false, system: \"Sos un revisor senior neutral. Recibis tres analisis de un mismo caso desde perspectivas civil/comercial, penal y laboral. Sintetiza un memo interno breve para el equipo: que fuero(s) aplica realmente, cuales argumentos son mas solidos, y que se necesita investigar mas antes de avanzar. No inventes jurisprudencia ni articulos que no te hayan pasado - si falta un dato marcalo como [VERIFICAR].\", prompt: (\"Civil/Comercial:\\n\" + $node[\"Perspectiva Civil/Comercial\"].json.response + \"\\n\\nPenal:\\n\" + $node[\"Perspectiva Penal\"].json.response + \"\\n\\nLaboral:\\n\" + $node[\"Perspectiva Laboral\"].json.response) }) }}",
+        "options": {}
+      },
+      "id": "sintesis",
+      "name": "Sintesis (memo interno)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [750, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { memo: $json.response, generado_en: $now } }}",
+        "options": {}
+      },
+      "id": "responder",
+      "name": "Responder",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1000, 300]
+    }
+  ],
+  "connections": {
+    "Recibir caso": {
+      "main": [
+        [
+          { "node": "Perspectiva Civil/Comercial", "type": "main", "index": 0 },
+          { "node": "Perspectiva Penal", "type": "main", "index": 0 },
+          { "node": "Perspectiva Laboral", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Perspectiva Civil/Comercial": {
+      "main": [[{ "node": "Unir perspectivas", "type": "main", "index": 0 }]]
+    },
+    "Perspectiva Penal": {
+      "main": [[{ "node": "Unir perspectivas", "type": "main", "index": 1 }]]
+    },
+    "Perspectiva Laboral": {
+      "main": [[{ "node": "Unir perspectivas", "type": "main", "index": 2 }]]
+    },
+    "Unir perspectivas": {
+      "main": [[{ "node": "Sintesis (memo interno)", "type": "main", "index": 0 }]]
+    },
+    "Sintesis (memo interno)": {
+      "main": [[{ "node": "Responder", "type": "main", "index": 0 }]]
+    }
+  }
+}

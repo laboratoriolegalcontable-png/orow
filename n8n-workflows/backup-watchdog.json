@@ -1,0 +1,73 @@
+{
+  "name": "Backup Watchdog - Alerta si Duplicati falla",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "duplicati-resultado",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook-duplicati",
+      "name": "Recibir resultado de Duplicati",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.body.Data ? $json.body.Data.ParsedResult : $json.body.ParsedResult }}",
+              "rightValue": "Success",
+              "operator": { "type": "string", "operation": "notEquals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "es-fallo",
+      "name": "Es fallo o warning?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.ALERTA_WHATSAPP_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ mensaje: \"Backup Duplicati con problemas: \" + ($json.body.Data ? $json.body.Data.ParsedResult : $json.body.ParsedResult) + \". Revisar http://localhost:8200 en el servidor.\" }) }}",
+        "options": {}
+      },
+      "id": "alertar",
+      "name": "Alertar (via Make.com / WhatsApp existente)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 200]
+    },
+    {
+      "parameters": {},
+      "id": "sin-accion",
+      "name": "Backup OK, sin accion",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [500, 400]
+    }
+  ],
+  "connections": {
+    "Recibir resultado de Duplicati": {
+      "main": [[{ "node": "Es fallo o warning?", "type": "main", "index": 0 }]]
+    },
+    "Es fallo o warning?": {
+      "main": [
+        [{ "node": "Alertar (via Make.com / WhatsApp existente)", "type": "main", "index": 0 }],
+        [{ "node": "Backup OK, sin accion", "type": "main", "index": 0 }]
+      ]
+    }
+  }
+}
