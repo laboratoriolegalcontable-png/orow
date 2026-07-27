@@ -38,11 +38,10 @@ consulta (SAIJ/JUBA), no un reemplazo de este skill.
 
 Este es el que más se conecta con la Fase 4. El checklist de compraventa
 que arma este skill (verificación de títulos, cargas, gravámenes) es
-exactamente el tipo de dato que encajaría en el campo `due_diligence`
-(jsonb) que ya existe en la tabla `propiedades` de Supabase — ver
-`docs/FASE-4-inmobiliaria.md` sobre la decisión pendiente de qué tabla usar.
-Cuando eso se confirme, el resultado de este skill se podría guardar
-directamente ahí en vez de en un documento suelto.
+exactamente el tipo de dato que encaja en el campo `due_diligence` (jsonb)
+que ya existe en la tabla `propiedades` de Supabase — confirmado como la
+tabla real (ver `docs/FASE-4-inmobiliaria.md`). El resultado de este skill
+se puede guardar directamente ahí en vez de en un documento suelto.
 
 ## `laboral-liquidaciones`
 

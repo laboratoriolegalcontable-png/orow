@@ -8,20 +8,27 @@
 | Stirling-PDF | `frooodle/s-pdf` | 8011 | No |
 | DocuSeal | `docuseal/docuseal` | 3005 | Postgres (incluido en el compose) |
 
-## Gestión de expedientes (OpenLex / Justicia 360): pendiente de definición real
+## Gestión de expedientes (OpenLex / Justicia 360): resuelto — ya existe, no se agrega
 
 El plan original proponía **OpenLex (PyAr)** como opción A y **Justicia 360**
-como fallback. No pude confirmar un paquete Docker oficial y mantenido
-públicamente para ninguno de los dos con esos nombres exactos — puede que
-sean proyectos internos, muy nuevos, o el nombre no sea exacto.
+como fallback. No se confirmó un paquete Docker oficial y mantenido
+públicamente para ninguno de los dos con esos nombres exactos.
 
-**Antes de instalar esto**, el Doctor debería confirmar:
-1. La URL del repo real (GitHub) de la herramienta que quiere.
-2. Si tiene `Dockerfile` o `docker-compose.yml` propio, o hay que armarlo.
+Al revisar el Supabase de producción (`moljmujlfvtsgkjbtwss`) para decidir
+esto, se encontró que **la gestión de expedientes ya existe y está en uso**:
+tabla `public.expedientes` (`numero_causa`, `juzgado`, `fuero`, `caratula`,
+`estado`, `cliente_id`, `proxima_fecha`, `alertas_activas`) con
+`alertas_judiciales` relacionada por `expediente_id`. Esto alimenta
+OroGest/NARAKIA — es el mismo sistema que ya se decidió no duplicar con un
+Kanban en Fase 8 (ver `docs/FASE-8-productividad.md`).
 
-Mientras tanto, el Postgres 16 + pgvector de **Fase 4** queda preparado para
-conectar cualquiera de las dos apenas se confirme — no hace falta levantar
-otro Postgres para esto.
+**Conclusión: no se instala OpenLex/Justicia 360 ni ninguna otra herramienta
+de gestión de expedientes en este repo.** Sumar un self-hosted nuevo
+partiría el estado de una causa entre dos lugares (igual que se evitó con
+el Kanban) sin ninguna ganancia real. El rol de esta Fase 2 queda acotado a
+lo que ya hace bien: **almacenamiento documental + OCR (Paperless-ngx) y
+firma digital (DocuSeal)** para los archivos vinculados a esos expedientes
+— no el registro del expediente en sí.
 
 ## Validación post-instalación
 

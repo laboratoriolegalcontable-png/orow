@@ -44,9 +44,9 @@ fallarían al hacer `docker pull`. En vez de eso quedan documentadas como
 pendiente de definición — si el Doctor tiene el repo/imagen real de alguna,
 se agrega en una fase posterior:
 
-- **OpenLex (PyAr)** / **Justicia 360** — gestión de expedientes. Se deja el
-  Postgres de Fase 4 listo para conectar cualquiera de las dos apenas se
-  confirme el repo real.
+- **OpenLex (PyAr)** / **Justicia 360** — gestión de expedientes. **Resuelto,
+  no se agrega ninguna**: ya existe la tabla `expedientes` en el Supabase de
+  producción (OroGest/NARAKIA) — ver `docs/FASE-2-legal.md`.
 - **Corredor (Property Manager 3.0)** — CRM inmobiliario. Idem: el Postgres +
   pgvector de Fase 4 queda preparado para lo que se decida usar (alternativas
   reales verificables: [Flowfact](https://flowfact.de), o construir uno propio
