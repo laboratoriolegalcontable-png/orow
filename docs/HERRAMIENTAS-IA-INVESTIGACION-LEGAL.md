@@ -38,7 +38,7 @@ Verificado directo en el repo (README + código):
   solo fuentes públicas. **No cargarlas sin decisión explícita** — son
   login judicial real, no una API key genérica.
 
-### Cómo instalarlo (paso a paso, para correr en el servidor o localmente)
+### Instalado — ya conectado en la Mac del Doctor
 
 ```bash
 git clone https://github.com/Probanza-ar/mcp-legal-ar.git
@@ -48,10 +48,15 @@ cd mcp-legal-ar
 claude mcp add legal-hub-ar -- node "$(pwd)/servers/legal-mcp/build/index.js"
 ```
 
+Confirmado con `claude mcp list`: `legal-hub-ar ... ✔ Connected`. El
+`setup.sh` además configuró Claude Desktop automáticamente (merge en
+`claude_desktop_config.json`) — quedó disponible en los dos: Claude Code y
+Claude Desktop.
+
 Sin las variables `MEV_*`/`EJE_*`/`PJN_*` en el entorno, el hub sigue
 funcionando con los 12 conectores públicos (SAIJ, JUBA, InfoLEG, BCRA,
 etc.) — agregar las tres de portales judiciales es un paso aparte,
-posterior y opcional.
+posterior y opcional, no hecho todavía.
 
 ## Cómo se usaría — resuelto: se conecta a Claude Code directo
 
