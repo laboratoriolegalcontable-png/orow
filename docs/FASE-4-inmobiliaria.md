@@ -25,10 +25,29 @@ había datos en riesgo, y el cambio es aditivo (columna `descripcion_embedding
 vector(1536)` + índice `ivfflat`, sin tocar ninguna columna existente).
 `get_advisors` (security) no reportó problemas nuevos sobre `propiedades`.
 
-**Pendiente todavía**: generar los vectores reales. La migración deja la
-columna vacía — falta decidir el modelo de embeddings (Ollama local, ya
-levantado en Fase 3, vs una API externa) y escribir el proceso que los
-calcule a partir de `descripcion` para cada fila nueva/existente.
+**Resuelto — modelo de embeddings**: Ollama local (Fase 3, ya levantado en
+el servidor), modelo `nomic-embed-text` (768 dimensiones) — sin costo de
+API externa, coherente con el resto del ecosistema self-hosted. La columna
+`descripcion_embedding` se ajustó de `vector(1536)` (asunción inicial de
+OpenAI) a `vector(768)` para matchear ese modelo — cambio seguro porque la
+tabla seguía en 0 filas al hacerlo.
+
+Script listo en `scripts/generate-property-embeddings.py`: toma cada fila
+de `propiedades` con `descripcion` pero sin embedding todavía, lo calcula
+vía Ollama y lo graba en Supabase por su REST API. Correrlo en el servidor
+(Ollama solo escucha en `127.0.0.1:11434` ahí):
+
+```bash
+docker exec oro-ollama ollama pull nomic-embed-text   # una sola vez
+
+export SUPABASE_URL="https://moljmujlfvtsgkjbtwss.supabase.co"
+export SUPABASE_SERVICE_ROLE_KEY="..."   # desde Vaultwarden, nunca hardcodeado
+python3 scripts/generate-property-embeddings.py
+```
+
+Como `propiedades` sigue en 0 filas, no hay nada que generar todavía — el
+script queda listo para correr (a mano o por cron) apenas empiecen a
+cargarse propiedades reales.
 
 El Postgres + pgvector local de esta fase (`inmobiliaria-db`) sigue
 levantado como entorno de desarrollo/pruebas — no se borra, pero la fuente

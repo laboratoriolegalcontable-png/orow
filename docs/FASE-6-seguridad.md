@@ -53,18 +53,21 @@ job de backup desde la UI (`http://localhost:8200`):
    ver `n8n-workflows/README.md` (`backup-watchdog.json`) para que un
    backup fallido avise solo, sin tener que revisar la UI todos los días.
 
-## AFRelay / facturación AFIP-ARCA: no incluido, requiere clave fiscal real
+## Facturación AFIP-ARCA: resuelto — corre en Render, fuera de este repo
 
-No encontré un proyecto open-source llamado "AFRelay" con paquete Docker
-verificable. Para facturación electrónica AFIP/ARCA real en Argentina, la vía
-madura y mantenida es [AfipSDK](https://github.com/AfipSDK) (librerías
-oficiales, no un servicio self-hosted único) o el webservice SOAP directo de
-AFIP (`wsfe`).
+No se agrega ningún servicio de facturación AFIP/ARCA acá: **ya está resuelto
+y desplegado en Render** — servicio `sabueso-backend`
+(`laboratoriolegalcontable-png/Diego-Orosa`, rama `deploy-sabueso-backend`,
+`https://sabueso-backend.onrender.com`), con `AFIP_CERT_PEM`/`AFIP_KEY_PEM`/
+`AFIP_ENV` como variables de entorno propias de ese servicio en Render — no en
+este repo ni en Vaultwarden de Fase 6. Fuera del alcance de Orosa Nexus (que
+solo cubre infraestructura self-hosted en el servidor Kimsufi/OVH). No se
+duplica ni se reemplaza con nada de este repo.
 
-**Esto requiere la clave fiscal real de Estudio Oro S.A.S.** — no se
-implementa nada de esto de forma autónoma. Cuando el Doctor quiera avanzar,
-confirmar puntualmente en ese momento antes de conectar cualquier
-credencial fiscal real a un servicio.
+(Nota histórica: se había evaluado un "AFRelay" propio con
+[AfipSDK](https://github.com/AfipSDK) o el webservice SOAP directo de AFIP
+— `wsfe` — para el caso de que no hubiera nada armado todavía. Quedó
+descartado porque la solución real ya existe en Render.)
 
 ## Credenciales: NUNCA en un archivo de texto plano
 

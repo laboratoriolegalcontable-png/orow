@@ -20,7 +20,7 @@ para nada.
 - [ ] n8n puede enviar un email de prueba vía SMTP real
 - [ ] Login en algún servicio usando Authentik como SSO (una vez conectado, ver Fase 6)
 - [ ] Duplicati completó un backup de prueba sin errores
-- [ ] AFRelay/facturación: no aplica todavía (ver Fase 6, pendiente de definición)
+- [x] Facturación AFIP/ARCA: resuelta en Render, fuera del alcance de este repo (ver Fase 6)
 
 ## Variables compartidas
 

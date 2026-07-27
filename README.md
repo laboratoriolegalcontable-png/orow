@@ -53,13 +53,11 @@ se agrega en una fase posterior:
   con el `estudio-oro-domain` skill).
   Ojo: **PropertyLoop es un servicio SaaS de Reino Unido, no self-hosted** —
   no aplica a este ecosistema.
-- **Signal (inteligencia de ventas)**, **OpenAdServer**, **AFRelay
-  (facturación AFIP/ARCA)** — no encontré proyectos open-source
-  self-hosteables verificables con estos nombres exactos. Para facturación
-  AFIP real en Argentina, la vía verificada y mantenida es
-  [AfipSDK](https://github.com/AfipSDK) o el propio webservice de AFIP — se
-  documenta en `docs/FASE-6-seguridad.md` como próximo paso, no como compose
-  listo.
+- **Signal (inteligencia de ventas)**, **OpenAdServer** — no encontré
+  proyectos open-source self-hosteables verificables con estos nombres
+  exactos. Si el Doctor tiene el repo real, se agrega.
+- **Facturación AFIP/ARCA** — resuelta, ya corre en Render, fuera del
+  alcance de este repo (ver `docs/FASE-6-seguridad.md`).
 
 Real Estate MCP Server (Python 3.10+, servidor MCP para flujos de IA sobre
 datos inmobiliarios) tampoco corresponde a un paquete Docker público
