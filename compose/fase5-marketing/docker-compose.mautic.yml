@@ -1,6 +1,12 @@
 # Overlay OPCIONAL — solo si el servidor tiene >4GB RAM libres reales.
 # Uso: docker compose -f docker-compose.yml -f docker-compose.mautic.yml up -d
 
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 networks:
   oro-net:
     external: true
@@ -14,6 +20,7 @@ services:
     image: docker.io/library/mysql:8.0
     container_name: oro-mautic-db
     restart: unless-stopped
+    logging: *default-logging
     networks: [oro-net]
     environment:
       MYSQL_ROOT_PASSWORD: ${MAUTIC_DB_ROOT_PASSWORD}
@@ -22,13 +29,20 @@ services:
       MYSQL_PASSWORD: ${MAUTIC_DB_PASSWORD}
     volumes:
       - mautic-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MAUTIC_DB_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   mautic:
     image: docker.io/mautic/mautic:v5-apache
     container_name: oro-mautic
     restart: unless-stopped
+    logging: *default-logging
     depends_on:
-      - mautic-db
+      mautic-db:
+        condition: service_healthy
     networks: [oro-net]
     ports:
       - "127.0.0.1:${MAUTIC_PORT:-8012}:80"
