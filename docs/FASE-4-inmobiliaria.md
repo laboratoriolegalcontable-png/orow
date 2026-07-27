@@ -53,6 +53,49 @@ El Postgres + pgvector local de esta fase (`inmobiliaria-db`) sigue
 levantado como entorno de desarrollo/pruebas — no se borra, pero la fuente
 de verdad en producción es Supabase.
 
+## Recomendador de propiedades ("también te puede interesar")
+
+Reemplaza al "OpenAdServer" del plan original (motor de ML para ads) por
+algo que sí tiene sentido construir: un recomendador de contenido propio
+para las webs del estudio (inmobiliaria, y el mismo patrón sirve para Lobo
+Confitería), en vez de competir con el bidding interno de Google/Meta Ads
+— ver `docs/FASE-5-marketing.md` sobre por qué se descartó eso.
+
+Función RPC en Supabase, `public.recomendar_propiedades_similares`: dada
+una propiedad, devuelve las N más parecidas por similitud de coseno sobre
+`descripcion_embedding` (mismo embedding de Ollama de la sección anterior).
+Es `security definer` a propósito — `propiedades` no tiene política RLS
+para `anon`/`authenticated` (solo `service_role`), así que sin
+`security definer` la función devolvería 0 filas siempre para un visitante
+público. Solo expone `id/titulo/zona/precio_usd/similitud` — nunca
+`due_diligence` ni otros campos internos. El linter de seguridad de
+Supabase marca esto como advertencia esperada (cualquier función
+`security definer` ejecutable por `anon` se señala) — es intencional acá.
+
+Se llama desde el frontend de la web (JS) así:
+
+```js
+const { data } = await supabase.rpc('recomendar_propiedades_similares', {
+  propiedad_id: idDeLaPropiedadQueEstaMirando,
+  limite: 5,
+});
+```
+
+O directo por REST sin el SDK:
+
+```bash
+curl -X POST "https://moljmujlfvtsgkjbtwss.supabase.co/rest/v1/rpc/recomendar_propiedades_similares" \
+  -H "apikey: <anon key>" \
+  -H "Content-Type: application/json" \
+  -d '{"propiedad_id": "<uuid>", "limite": 5}'
+```
+
+No hace falta ningún servicio nuevo en `compose/` ni llamar a Ollama en el
+momento de la consulta — la similitud se calcula sobre embeddings ya
+guardados, así que es solo una consulta SQL. Como `propiedades` sigue en 0
+filas, todavía no hay nada que recomendar — queda listo para cuando se
+carguen propiedades reales con embedding generado.
+
 ## Lo que NO se instala (y por qué)
 
 El plan original pedía **"Corredor (Property Manager 3.0)"** como CRM

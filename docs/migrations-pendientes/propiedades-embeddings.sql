@@ -1,36 +1,30 @@
--- Migracion PENDIENTE para el proyecto Supabase moljmujlfvtsgkjbtwss.
--- NO APLICADA TODAVIA. Ver docs/FASE-4-inmobiliaria.md.
+-- Migracion APLICADA al proyecto Supabase moljmujlfvtsgkjbtwss. Ver
+-- docs/FASE-4-inmobiliaria.md para el detalle completo de la decision.
 --
--- Contexto: la tabla `propiedades` en produccion (bots NARAKIA) no tiene
+-- Contexto: la tabla `propiedades` en produccion (bots NARAKIA) no tenia
 -- ninguna columna de embeddings. Esto agrega busqueda semantica sobre la
 -- descripcion de cada propiedad, sin tocar ninguna columna existente ni
 -- ninguna de las otras tablas inmobiliarias (inmuebles, megan_properties,
 -- oroprop_*, real_estate_leads).
 --
--- Antes de correr esto en produccion:
---   1. Confirmar que `propiedades` es efectivamente la tabla que Orosa Nexus
---      Fase 4 va a usar (pendiente de confirmacion del Doctor).
---   2. Correr esto primero en un branch de Supabase (create_branch), nunca
---      directo en produccion.
---   3. El modelo de embeddings a usar (dimension 1536 asume OpenAI
---      text-embedding-3-small u Ollama con un modelo compatible) debe
---      confirmarse antes de generar los vectores reales.
+-- Historial: se aplico primero en vector(1536) (asumiendo OpenAI
+-- text-embedding-3-small), y despues se confirmo Ollama local
+-- (nomic-embed-text, 768 dimensiones) como modelo real - se ajusto la
+-- columna a vector(768) mientras la tabla seguia en 0 filas (cambio
+-- seguro, sin datos en riesgo). Este archivo refleja el estado final.
 
 create extension if not exists vector;
 
 alter table public.propiedades
-    add column if not exists descripcion_embedding vector(1536);
+    add column if not exists descripcion_embedding vector(768);
 
 create index if not exists idx_propiedades_embedding
     on public.propiedades
     using ivfflat (descripcion_embedding vector_cosine_ops)
     with (lists = 100);
 
--- Function de ejemplo para busqueda semantica (ajustar segun como se generen
--- los embeddings - Ollama local vs API externa):
---
--- select id, titulo, zona, precio_usd
--- from public.propiedades
--- where descripcion_embedding is not null
--- order by descripcion_embedding <=> '[...]'::vector
--- limit 10;
+-- Generacion de los vectores: scripts/generate-property-embeddings.py
+-- (Ollama local, modelo nomic-embed-text).
+
+-- Busqueda de propiedades similares por descripcion: ver la funcion RPC
+-- recomendar-propiedades-similares.sql en esta misma carpeta.
