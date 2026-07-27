@@ -53,9 +53,14 @@ se agrega en una fase posterior:
   con el `estudio-oro-domain` skill).
   Ojo: **PropertyLoop es un servicio SaaS de Reino Unido, no self-hosted** —
   no aplica a este ecosistema.
-- **Signal (inteligencia de ventas)**, **OpenAdServer** — no encontré
-  proyectos open-source self-hosteables verificables con estos nombres
-  exactos. Si el Doctor tiene el repo real, se agrega.
+- **Signal (inteligencia de ventas)** — **resuelto, no se agrega nada**: ya
+  cubierto por los skills de cuenta `scrapling` (prospección +
+  enriquecimiento) e `ia-para-ventas` (scoring de leads) — ver
+  `docs/FASE-5-marketing.md`.
+- **OpenAdServer** — se descartó **Revive Adserver** (real, open-source,
+  pero es ad-server tradicional, no el motor de ML que pedía el plan
+  original). Construir el motor de ML real es un proyecto de desarrollo
+  aparte, pendiente de definir alcance — ver `docs/FASE-5-marketing.md`.
 - **Facturación AFIP/ARCA** — resuelta, ya corre en Render, fuera del
   alcance de este repo (ver `docs/FASE-6-seguridad.md`).
 
