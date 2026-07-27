@@ -28,11 +28,12 @@ Con Orosa Nexus arriba:
 ## `jurisprudencia-argentina`
 
 Este skill ya busca en fuentes oficiales verificables (CSJN, SCBA, CNCP,
-etc.) — no depende de Orosa Nexus para funcionar. La única pieza
-relacionada de este repo es el **Legal Hub MCP**
-(`docs/HERRAMIENTAS-IA-INVESTIGACION-LEGAL.md`, pendiente de definir cómo
-se integra) — si en el futuro se conecta, sería una fuente adicional de
-consulta (SAIJ/JUBA), no un reemplazo de este skill.
+etc.) — no depende de Orosa Nexus para funcionar. La pieza relacionada de
+este repo es el **Legal Hub MCP**
+(`docs/HERRAMIENTAS-IA-INVESTIGACION-LEGAL.md`, instalación y método de
+integración ya confirmados — falta solo correr `claude mcp add` cuando el
+Doctor quiera activarlo) — sería una fuente adicional de consulta
+(SAIJ/JUBA/InfoLEG/BCRA), no un reemplazo de este skill.
 
 ## `due-diligence-inmobiliario`
 
